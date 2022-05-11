@@ -1,6 +1,10 @@
 const express = require('express');
+const cors = require('cors');
 const app = express();
 const port = process.env.PORT || 5000;
+
+app.use(cors())
+app.use(express.json());
 
 const users = [
   {
@@ -238,15 +242,31 @@ app.get('/', (req, res) => {
   res.send('hey brooooo i can write lil bit node');
 });
 
-app.get('/user', (req, res) => {
-  res.send(users);
+app.get('/users', (req, res) => {
+  if (req.query.name) {
+    const search = req.query.name;
+    const matched = users.filter(u =>u.name.toLocaleLowerCase().includes(search))
+    res.send(matched)
+  } 
+  else {
+    res.send(users)
+  }
 });
+
+
 app.get('/user/:id', (req, res) => {
   console.log(req.params);
   const id = parseInt(req.params.id);
   const user = users.find(u => u.id === id)
   res.send(user)
 });
+
+app.post('/user', (req, res) => {
+  const user = req.body;
+  user.id = users.length + 1;
+  users.push(user);
+  res.send(user);
+})
 
 app.get('/profile', (req, res) => {
   res.send('astala vista bby');
